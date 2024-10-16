@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> ESGenius</title>
+    <link rel="icon" href="{{url_for('static',filename='images/agents.png')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="menu">
+        <h2  clas="menu-header" onclick="toggleMenu()">
+            <span class="toggle-arrow_menu">&#10094;</span> <!-- 右箭头 -->
+            Menu
+        </h2>
+        <ul class="menu-content">
+            <li><a href="{{ url_for('home') }}" class="menu-item" onclick="switchTab(this)">永續問答</a></li>
+            <li><a href="{{ url_for('generator_reporter') }}" class="menu-item" onclick="switchTab(this)">永續報告書撰寫</a></li>
+            <li><a href="{{ url_for('check_reporter') }}" class="menu-item" onclick="switchTab(this)">報告評比系統</a></li>
+            <hr>
+            <li><a href="{{ url_for('gonvernment_rule') }}" class="menu-item active" onclick="switchTab(this)">相關資料</a></li>
+        </ul>
+    </div>
+    <div class="rule">
+        <h2>相關政策</h2>
+        <div id="rule-content">
+        <a href="" class="name-item">IFRS永續揭露準則問答集 </a>
+        <a href="" class="name-item">「上市櫃公司永續發展路徑圖」問答集 </a>
+            <!-- <li class="name-item">IFRS永續揭露準則問答集 </li>
+            <embed src="{{ url_for('static', filename='rule/IFRS_QA.pdf') }}" width="100%" height="600px" type="application/pdf">
+            <li class="name-item">「上市櫃公司永續發展路徑圖」問答集 </li>
+            <embed src="{{ url_for('static', filename='rule/esg_path_qa.pdf') }}" width="100%" height="600px" type="application/pdf"> -->
+        <h2>撰寫指引</h2>
+        <a href="https://www.ifrs.org/news-and-events/news/2023/06/issb-issues-ifrs-s1-ifrs-s2/" class="name-item">永續揭露準則ISSB S1 S2</a>
+        <a href="https://www.ifrs.org/news-and-events/news/2023/06/issb-issues-ifrs-s1-ifrs-s2/" class="name-item">GRI 準則 (GRI Standards)正體中文版</a>
+        <a href="https://www.ifrs.org/news-and-events/news/2023/06/issb-issues-ifrs-s1-ifrs-s2/" class="name-item">氣候相關財務揭露建議(TCFD)正體中文版</a>
+        <a href="https://www.ifrs.org/news-and-events/news/2023/06/issb-issues-ifrs-s1-ifrs-s2/" class="name-item">企業報導整合 SDGs 實務指南</a>
+
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='chat.js') }}"></script>
+</body>
+</html>

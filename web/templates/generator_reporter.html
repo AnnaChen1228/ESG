@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> ESGenius</title>
+    <link rel="icon" href="{{url_for('static',filename='images/agents.png')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="menu">
+        <h2  clas="menu-header" onclick="toggleMenu()">
+            <span class="toggle-arrow_menu">&#10094;</span> <!-- 右箭头 -->
+            Menu
+        </h2>
+        <ul class="menu-content">
+            <li><a href="{{ url_for('home') }}" class="menu-item" onclick="switchTab(this)">永續問答</a></li>
+            <li><a href="{{ url_for('generator_reporter') }}" class="menu-item active" onclick="switchTab(this)">永續報告書撰寫</a></li>
+            <li><a href="{{ url_for('check_reporter') }}" class="menu-item" onclick="switchTab(this)">報告評比系統</a></li>
+            <hr>
+            <li><a href="{{ url_for('gonvernment_rule') }}" class="menu-item" onclick="switchTab(this)">相關資料</a></li>
+        </ul>
+    </div>
+    <div class="chat-box">
+        <h2>ESGenius</h2>
+        <div id="chat-content">
+            <div class="message system-message">你好!我是ESGenius，如果需要協助撰寫永續報告書請提供我產業別與撰寫目標與相關數據!</div>
+        </div>
+        <div class="input-box">
+            <input type="text" id="user-input" placeholder="輸入訊息..." onkeyup="handleInput(event)" />
+        </div>
+    </div>
+    <div class="hint">
+            <h2 class="hint-header" onclick="toggleHint()">
+                撰寫概要 
+                <span class="toggle-arrow">&#10095;</span> <!-- 右箭头 -->
+            </h2>
+            <div class="hint-content">
+                <div class="hint-tag">要求:</div>
+                <div class="hint-message" id="request-message">
+                    <span id="request-message-display"></span>
+                    <br>
+                    <span id="request-more" class="show-more" onclick="toggleMore('request')" style="display: none;color:blue;">顯示更多</span>
+                </div>
+                
+                <div class="hint-tag">建議:</div>
+                <div class="hint-message" id="advice-message">
+                    <span id="advice-message-display"></span>
+                    <br>
+                    <span id="advice-more" class="show-more" onclick="toggleMore('advice')" style="display: none;color:blue;">顯示更多</span>
+                </div>
+                
+                <div class="hint-tag">指引:</div>
+                <div class="hint-message" id="guide-message">
+                    <span id="guide-message-display"></span>
+                    <br>
+                    <span id="guide-more" class="show-more" onclick="toggleMore('guide')" style="display: none;color:blue;">顯示更多</span>
+                </div>
+            </div>
+    </div>
+    
+    <div id="myModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <script src="{{ url_for('static', filename='chat.js') }}"></script>
+    <script>
+    let Question = ['引導我們撰寫永續報告書，我們是上櫃公司，產業別是半導體','我想要撰寫有關能源的部分','使用者輸入: 我想先撰寫有關減少能源消耗的內容','我想先撰寫有關減少能源消耗的內容'];
+    let Answer = ['依據上櫃公司編製與申報永續報告書作業辦法，若半導體業公司實收資本額20億元以上，需參考GRI準則編製，專章揭露氣候相關資訊，永續指標要依產業別揭露。\n當中GRI準則有下列目錄:<a href="https://www.globalreporting.org/how-to-use-the-gri-standards/gri-standards-traditional-chinese-translations/" target="_blank">GRI目錄</a>','GRI 302能源 的揭露項目有: 組織內部的能源消耗量、組織外部的能源消耗量、能源密集度、減少能源消耗、降低產品和服務的能源需求'];
+    let Report = [
+    '本文章會自行補上一些並非是貴公司的案例提供給您做撰寫參考，請您自行將那些案例替換成符合貴公司的情況再自行修改，謝謝!\n#### 節能改善項目概述\n在2023年，中大永續院公司計畫並正在實施801件節能改善項目。這些項目旨在提高能源效率，減少碳排放，並為公司帶來可觀的經濟效益。具體來說，我們預計每小時可節省蒸汽38.92噸，節省電力15,271度，節省燃料5.758噸，並減少溫室氣體排放量達28.90萬噸二氧化碳當量（CO2e）/年。這些數據顯示了我們在能源管理和溫室氣體減排方面的顯著進展。\n#### 投資與效益\n這些節能改善項目的總投資金額預計達到27.7億元，並且每年的投資效益預估可達12.2億元。這不僅體現了我們對永續發展的強烈承諾，也顯示了我們在經濟效益和環境保護之間取得的平衡。\n#### 氣候相關風險與機會\n氣候變遷帶來的風險與機會對於我們的業務運營至關重要。為了應對這些挑戰，我們積極採取一系列措施，將氣候相關風險納入企業決策中，並認真評估每一個項目對於環境和社會的影響。我們相信，通過積極應對氣候變遷，可以為公司創造更多的機會，並為股東和社會帶來長期的價值。\n#### 清潔技術與創新\n在推動節能改善項目的過程中，我們積極採用清潔技術和創新解決方案。例如，在「冷凍機節電改善」項目中，我們預計每小時可節省電力1,343度。這些技術不僅幫助我們提高資源利用效率，還能減少對環境的影響。我們致力於成為行業內的領導者，為其他企業樹立榜樣。\n#### 利害關係人參與\n我們深信，永續發展需要所有利害關係人的共同努力。因此，我們積極與投資人、自願揭露的利害關係人以及其他重要的利益相關者保持溝通。透過公開透明的資訊披露，我們希望能夠反映組織在經濟、環境和社會方面的重要影響，並且有助於利害關係人的決策。\n#### 全球永續性報告\n我們的永續發展報告遵循全球永續性報告標準（GRI）的指引，並且在報告中詳細披露了每個基金、產品或投資策略相關的溫室氣體排放數據。我們重視數據的準確性和完整性，並且針對質化和量化的情境分析進行了嚴格的內部審核和評估。\n#### 未來展望\n展望未來，我們將繼續致力於推動更多的節能和減排項目，並且不斷尋求創新和技術突破。我們期待與更多的利害關係人合作，共同推動全球的永續發展目標。通過我們的努力，我們相信可以為我們的社會和地球創造一個更加美好的未來。\n#### 結語\n中大永續院公司在2023年的節能改善項目和永續發展努力，充分展示了我們對環境保護、資源節約和社會責任的承諾。我們將繼續以最高的標準要求自己，並且通過透明和負責任的報告，與所有利害關係人分享我們的成果和挑戰。我們相信，只有在共同努力下，才能實現真正的永續發展。'
+    ];
+    let Requestment = ['報導組織應報導以下資訊：\na. 以焦耳或其倍數為單位，計算因採取節能與效率提升倡議專案而直接減少的能源消耗量。\nb. 此減少的能源消耗量中所包含的能源類型；燃料、電力、供熱、製冷、蒸汽或全部。\nc. 計算能源消耗量減少的基準，例如：基準年或基線，包括選擇此一基準的理由。\nd. 使用的標準、方法學、假設、及/或計算工具。\n彙編要求:\n1. 排除因產能下降或外包所導致的減量；\n2. 說明減少之能源是否係採估算、模式分析或採直接量測得之。若採估算或模式分析得之，組織應揭露所用之方法。']
+    let Advice = ['若依照不同的標準與方法學，報導組織宜說明選擇標準和方法學的方式。']
+    let Guide = ['報導組織得優先揭露在報導期間內所執行，具顯著減量潛力的行動方案。亦得在報導如何管理此主題時描述減量行動方案及其標的。\na.減量行動方案得包括：\n b.流程重新設計；\n c.設備改善或更新；\nd.行為改變；\ne.營運變化。\n組織得結合不同的能源類型報導能源消耗減少量，或依燃料、電力、供熱、製冷及蒸汽分別報導之。 組織也得就個別或集體的行動方案，分別提供能源消耗的減少量。\n']
+    async function handleInput(event) {
+        if (event.key === 'Enter') {
+            var inputField = document.getElementById('user-input');
+            var userMessage = inputField.value.trim();
+
+            if (userMessage !== "") {
+                // 清空輸入框
+                inputField.value = "";
+
+                // 顯示用戶訊息
+                var userMessageElement = document.createElement('div');
+                userMessageElement.className = 'message user-message';
+                userMessageElement.textContent = userMessage;
+                var chatContent = document.getElementById('chat-content');
+                chatContent.appendChild(userMessageElement);
+
+                // 查找對應的問題
+                let matchedIndex = -1;
+                for (let i = 0; i < Question.length; i++) {
+                    if (userMessage.includes(Question[i])) {
+                        matchedIndex = i;
+                        break;
+                    }
+                }
+
+                if (matchedIndex !== -1) {
+                    if (matchedIndex === 3) {
+                        // 查找是否已經存在報告部分
+                        var existingReport = document.querySelector('.report-container');
+                        updateMessageDisplay('request', Requestment[0].replace(/\n/g, "<br>"));
+                        updateMessageDisplay('advice', Advice[0].replace(/\n/g, "<br>"));
+                        updateMessageDisplay('guide', Guide[0].replace(/\n/g, "<br>"));
+                        if (existingReport) {
+                            // 如果存在，則切換顯示
+                            var reportFull = existingReport.querySelector('.report-full');
+                            var toggleText = existingReport.querySelector('.show-more');
+
+                            if (reportFull.style.display === 'none') {
+                                reportFull.style.display = 'block';
+                                toggleText.textContent = '顯示更少';
+                            } else {
+                                reportFull.style.display = 'none';
+                                toggleText.textContent = '顯示更多';
+                            }
+                        } else {
+                            // 生成可折疊報告部分
+                            var reportContainer = document.createElement('div');
+                            reportContainer.className = 'message system-message report-container'; // 將報告容器設為 system-message class
+
+                            // 顯示報告內容 (前100個字)
+                            var reportContent = document.createElement('div');
+                            reportContent.innerHTML = Report[0].replace(/\n/g, "<br>").substring(0, 100) + "..."; // 顯示前100個字
+
+                            // 顯示完整內容 (初始為隱藏)
+                            var reportFull = document.createElement('div');
+                            reportFull.className = 'report-full'; // 僅設置報告內容的類別
+                            reportFull.style.display = 'none'; // 初始隱藏
+                            reportFull.innerHTML = Report[0].replace(/\n/g, "<br>"); // 顯示完整的報告內容
+
+                            // 創建顯示更多的文字區域
+                            var toggleText = document.createElement('span');
+                            toggleText.className = 'show-more';
+                            toggleText.textContent = '顯示更多';
+                            toggleText.style.cursor = 'pointer';
+                            toggleText.style.color = 'blue'; // 文字設為藍色以示可點擊
+
+                            // 點擊切換 "顯示更多"時替換內容
+                            toggleText.addEventListener('click', function() {
+                                // 顯示完整內容
+                                reportFull.style.display = 'block'; // 顯示完整內容
+                                reportContent.style.display = 'none'; // 隱藏前100字內容
+                                toggleText.style.display = 'none'; // 隱藏“顯示更多”文字
+
+                                // 創建顯示更少的文字區域
+                                var showLessText = document.createElement('span');
+                                showLessText.className = 'show-less';
+                                showLessText.textContent = '顯示更少';
+                                showLessText.style.cursor = 'pointer';
+                                showLessText.style.color = 'blue'; // 文字設為藍色以示可點擊
+
+                                // 添加顯示更少的事件處理器
+                                showLessText.addEventListener('click', function() {
+                                    // 恢復為前100個字的內容
+                                    reportFull.style.display = 'none'; // 隱藏完整內容
+                                    reportContent.style.display = 'block'; // 顯示前100字內容
+                                    toggleText.style.display = 'inline'; // 重新顯示“顯示更多”
+                                    showLessText.remove(); // 移除“顯示更少”文字
+                                });
+
+                                reportContainer.appendChild(showLessText); // 在<hr>之後顯示“顯示更少”
+                            });
+
+                            // 檢查是否已經顯示內容以避免重複
+                            if (!document.querySelector('.report-container')) {
+                                // 添加元素到報告容器
+                                reportContainer.appendChild(reportContent); // 報告內容
+                                reportContainer.appendChild(reportFull); // 完整內容（初始為隱藏）
+                                reportContainer.appendChild(document.createElement('hr')); // 在報告內容和切換文字之間插入hr
+                                reportContainer.appendChild(toggleText); // 顯示更多在<hr>之後
+                                chatContent.appendChild(reportContainer); // 只有在沒有報告容器的情況下添加
+                            }
+                            setTimeout(function() {
+                                var imageContainer = document.createElement('div');
+                                imageContainer.className = 'image-container';
+                                imageContainer.innerHTML = `
+                                    <img class="hint-image" id="hint-image" src="static/images/report/1.jpg" onclick="openModal(this)">
+                                `;
+                                chatContent.appendChild(imageContainer); // 添加到聊天內容
+                            }, 5000); // 延遲5秒顯示圖片
+                        }
+                    } else {
+                        // 延遲1秒後顯示答案
+                        setTimeout(() => {
+                            // 顯示系統訊息 (答案)
+                            var systemMessageElement = document.createElement('div');
+                            systemMessageElement.className = 'message system-message';
+                            systemMessageElement.innerHTML = Answer[matchedIndex].replace(/\n/g, "<br>");
+                            chatContent.appendChild(systemMessageElement);
+
+                            // 自動滾動到最新訊息
+                            chatContent.scrollTop = chatContent.scrollHeight;
+                        }, 3000); // 1秒延遲
+                    }
+                } else {
+                    // 未匹配到問題，顯示錯誤訊息
+                    var systemMessageElement = document.createElement('div');
+                    systemMessageElement.className = 'message system-message';
+                    systemMessageElement.textContent = "抱歉，我無法找到相關內容。";
+
+                    chatContent.appendChild(systemMessageElement);
+
+                    // 自動滾動到最新訊息
+                    chatContent.scrollTop = chatContent.scrollHeight;
+                }
+
+                
+
+            }
+        }
+    }
+
+    function updateMessageDisplay(type, message) {
+    const displayId = `${type}-message-display`;
+    const moreId = `${type}-more`;
+
+    if (message.length > 100) {
+        const shortMessage = message.slice(0, 100) + '...';
+        document.getElementById(displayId).innerHTML = shortMessage; // 使用 innerHTML 支持換行
+        document.getElementById(moreId).style.display = 'inline'; // 顯示“顯示更多”文本
+        document.getElementById(moreId).setAttribute('data-full-message', message); // 保存完整信息
+        document.getElementById(moreId).setAttribute('data-expanded', 'false'); // 保存展開狀態
+    } else if (message.length > 0) {
+        document.getElementById(displayId).innerHTML = message;
+        document.getElementById(moreId).style.display = 'none'; // 隱藏“顯示更多”文本
+    } else {
+        document.getElementById(displayId).textContent = '無可用信息'; // 或其他提示文本
+        document.getElementById(moreId).style.display = 'none'; // 隱藏“顯示更多”文本
+    }
+}
+
+function toggleMore(type) {
+    const display = document.getElementById(`${type}-message-display`);
+    const more = document.getElementById(`${type}-more`);
+    
+    if (more.getAttribute('data-expanded') === 'false') {
+        // 展開顯示完整信息
+        const fullMessage = more.getAttribute('data-full-message');
+        display.innerHTML = fullMessage.replace(/\n/g, "<br>"); // 支持換行
+        more.textContent = '顯示更少'; // 修改為“顯示更少”
+        more.setAttribute('data-expanded', 'true'); // 更新展開狀態
+    } else {
+        // 縮小顯示前100字符
+        const shortMessage = more.getAttribute('data-full-message').slice(0, 100) + '...';
+        display.innerHTML = shortMessage;
+        more.textContent = '顯示更多'; // 修改為“顯示更多”
+        more.setAttribute('data-expanded', 'false'); // 更新展開狀態
+    }
+}
+    let currentImageIndex = 0;
+        const images = [
+            'static/images/report/1.jpg',
+            'static/images/report/2.jpg'
+        ];
+
+    function changeImage(direction) {
+        currentImageIndex += direction;
+        if (currentImageIndex < 0) currentImageIndex = images.length - 1;
+        if (currentImageIndex >= images.length) currentImageIndex = 0;
+        document.getElementById('hint-image').src = images[currentImageIndex];
+    }
+    let currentImageIndex_re = 0;
+        const re_images = [
+            'static/images/G/1.jpg',
+            'static/images/E/1.jpg', // Add more image paths here
+            'static/images/S/1.jpg'
+        ];
+
+    function changeImage_re(direction) {
+        currentImageIndex_re += direction;
+        if (currentImageIndex_re < 0) currentImageIndex_re = re_images.length - 1;
+        if (currentImageIndex_re >= re_images.length) currentImageIndex_re = 0;
+        document.getElementById('hint-image_re').src = re_images[currentImageIndex_re];
+    }
+
+    function openModal(img) {
+        var modal = document.getElementById("myModal");
+        var modalImg = document.getElementById("modalImage");
+        modal.style.display = "block";
+        modalImg.src = img.src;
+    }
+    
+    function closeModal() {
+        var modal = document.getElementById("myModal");
+        modal.style.display = "none";
+    }
+    
+    const messageDiv = document.getElementById("systemMessage");
+    const showMore = document.getElementById("showMore");
+
+    showMore.addEventListener("click", function() {
+        messageDiv.classList.toggle("expanded");
+        showMore.textContent = messageDiv.classList.contains("expanded") ? "顯示較少" : "顯示更多";
+    });
+    </script>
+</body>
+</html>

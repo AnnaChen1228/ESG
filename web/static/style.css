@@ -1,0 +1,395 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+    flex-direction: row; 
+}
+
+hr {
+    border: none; /* 移除默认边框 */
+    height: 1px; /* 设置高度 */
+    background-color: #ccc; /* 设置背景颜色为灰色 */
+    margin: 10px 0; /* 添加上下间距 */
+}
+
+
+.menu {
+    width: 13%; /* 固定宽度 */
+    background-color: #d4edda;
+    padding: 20px;
+    box-sizing: border-box;
+    position: relative;
+    height: 100vh; /* 固定高度，使其不受内容影响 */
+    overflow-y: auto; /* 如果菜单内容超出高度，则添加滚动条 */
+    flex-shrink: 0;
+}
+
+.menu ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.menu-item {
+    text-decoration: none;
+    color: gray; 
+    font-weight: bold; 
+    display: block;
+    padding: 10px 0;
+}
+
+.menu-content {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: block; /* Ensure content is displayed by default */
+}
+
+
+.menu-item:hover {
+    cursor: pointer;
+    color: black; 
+}
+
+.menu-item.active {
+    color: black; 
+}
+
+
+
+.chat-box, .report{
+    flex-grow: 1;
+    background-color: #ffffff; 
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+    padding: 20px;
+    height: 100vh; 
+}
+
+.chat-box{
+    overflow: hidden;
+}
+
+#chat-content{
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.message {
+    border-radius: 15px;
+    padding: 10px;
+    margin-bottom: 10px;
+    max-width: 80%; 
+    word-wrap: break-word; 
+    display: inline-block; 
+}
+
+.user-message {
+    background-color: #e0ffe0; 
+    align-self: flex-end; 
+    text-align: left; 
+}
+
+.system-message {
+    background-color: #f0f0f0; 
+    align-self: flex-start; 
+    text-align: left; 
+}
+
+.system-message.expanded {
+    max-height: none; /* 無高度限制 */
+}
+
+
+.ref-message {
+    background-color: white; 
+    align-self: flex-start; 
+    text-align: left; 
+    margin-top: -10px;
+}
+
+.input-box {
+    width: 100%;
+    padding-top: 10px;
+    box-sizing: border-box;
+    position: relative; /* 为了将迴紋針图标定位 */
+}
+
+.input-box input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 15px; 
+    border: 1px solid #ccc; 
+    box-sizing: border-box;
+}
+
+.input-box input:focus {
+    outline: none;
+    border-color: #888; 
+}
+
+.file-upload-label {
+    position: absolute;
+    right: 15px; /* 图标靠右 */
+    top: 65%; /* 垂直居中 */
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px; /* 调整图标大小 */
+    color: #555;
+}
+
+.file-upload-label:hover {
+    color: #000; /* 悬停时改变颜色 */
+}
+
+.input-box input[type="file"] {
+    display: none; /* 隐藏文件上传按钮 */
+}
+
+
+.check-box{
+    width: 30%; /* 初始宽度 */
+    /* height: 50%; */
+    background-color: #D3D3D3;
+    padding: 20px;
+    box-sizing: border-box;
+    position: relative;
+    height: 100vh;
+    overflow-y: auto;
+    flex-shrink: 0;
+    transition: width 0.3s ease; /* 添加动画效果 */
+}
+
+.check-box{
+    overflow: hidden;
+}
+
+.report {
+    width: 30%; /* 初始宽度 */
+    /* height: 50%; */
+    background-color: #ffffff;
+    padding: 20px;
+    box-sizing: border-box;
+    position: relative;
+    height: 100vh;
+    overflow-y: auto;
+    flex-shrink: 0;
+    /* transition: width 0.3s ease; 添加动画效果 */
+}
+
+#report-content{
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.rule{
+    width: 100%;
+    background-color: #ffffff;
+    box-sizing: border-box;
+    padding: 20px;
+    overflow-y: auto; 
+    height: 100vh; 
+}
+
+/* #report-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; 
+} */
+
+.section, .image {
+    box-sizing: border-box;
+    width: calc(33.333% - 10px); 
+    margin-bottom: 10px;
+}
+
+.section {
+    font-size: 24px;
+    font-weight: bold;
+    padding: 20px;
+    text-align: center;
+}
+
+.image {
+    /* width: 30%; */
+    height: 200px; 
+    object-fit: cover;
+}
+
+
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 2; 
+    padding: 20px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.8); 
+}
+
+.modal-content {
+    margin: auto;
+    display: block;
+    width:90%;
+}
+
+.close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #fff;
+    font-size: 40px;
+    font-weight: bold;
+    /* cursor: pointer;  */
+}
+
+.close:hover,.close:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.name-item{
+    text-decoration: none;
+    color: black; 
+    font-size: 18px;
+    font-weight: bold; 
+    display: block;
+    padding: 10px ; 
+}
+
+#rule-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    /* padding: 10px; */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.hint {
+    width: 30%; /* 初始宽度 */
+    /* height: 50%; */
+    background-color: #D3D3D3;
+    padding: 20px;
+    box-sizing: border-box;
+    position: relative;
+    height: 100vh;
+    overflow-y: auto;
+    flex-shrink: 0;
+    transition: width 0.3s ease; /* 添加动画效果 */
+}
+
+.hint.collapsed{
+    width: 11%; /* 折叠后的宽度 */
+    padding: 10px; /* 缩小padding */
+}
+
+.menu.collapsed{
+    width: 8%; /* 折叠后的宽度 */
+    padding: 10px; /* 缩小padding */
+}
+
+.hint-message {
+    text-align: left;
+    padding: 5px;
+}
+
+.hint-tag {
+    font-weight: bold;
+    font-size: 20px;
+    text-align: left;
+    padding: 3px;
+    
+}
+
+.hint-image {
+    /* height: 200px; */
+    width: 100%;
+    object-fit: cover;
+    margin-top: 10px;
+    cursor: pointer;
+}
+.image-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.arrow-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);  /* Gray background with 50% opacity */
+    color: white;  /* White arrow color */
+    padding: 10px;
+    cursor: pointer;
+    z-index: 1;  /* Ensures the arrows are above the image */
+    border-radius: 50%;  /* Makes the background circular */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;  /* Set a width for the circular button */
+    height: 20px;  /* Set a height for the circular button */
+}
+
+
+.arrow-btn:first-child {
+    left: 10px; /* Adjust as needed */
+}
+
+.arrow-btn:last-child {
+    right: 10px; /* Adjust as needed */
+}
+
+
+
+.hint-content .menu-content{
+    display: block;
+}
+
+.hint.collapsed .hint-content {
+    display: none; /* 折叠时隐藏内容 */
+}
+
+.menu.collapsed .menu-content{
+    display: none; /* 折叠时隐藏内容 */
+}
+
+.toggle-arrow .toggle-arrow_menu{
+    /* margin-left: 10px; 给箭头和文本之间留一点间距 */
+    font-size: 18px;
+}
+
+.hint-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hint.collapsed .hint-header .menu.collapsed .menu-header{
+    justify-content: space-between;
+}
+

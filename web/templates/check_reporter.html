@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> ESGenius</title>
+    <link rel="icon" href="{{url_for('static',filename='images/agents.png')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .highlight {
+                    color: black; /* 文本颜色 */
+                    background-color: yellow; /* 背景颜色形成荧光效果 */
+                    padding: 2px 4px; /* 添加一些内边距以增强效果 */
+                    border-radius: 4px; /* 圆角 */
+        }
+
+
+        .strikethrough {
+            text-decoration: line-through; /* 添加删除线 */
+        }
+
+        .red_color {
+            color: red;
+        }
+
+        .green_color{
+            color: green;
+        }
+    </style>
+</head>
+<body onload="initializeReportContent()">
+    <div class="menu">
+        <h2  clas="menu-header" onclick="toggleMenu()">
+            <span class="toggle-arrow_menu">&#10094;</span> <!-- 右箭头 -->
+            Menu
+        </h2>
+        <ul class="menu-content">
+            <li><a href="{{ url_for('home') }}" class="menu-item" onclick="switchTab(this)">永續問答</a></li>
+            <li><a href="{{ url_for('generator_reporter') }}" class="menu-item" onclick="switchTab(this)">永續報告書撰寫</a></li>
+            <li><a href="{{ url_for('check_reporter') }}" class="menu-item active" onclick="switchTab(this)">報告評比系統</a></li>
+            <hr>
+            <li><a href="{{ url_for('gonvernment_rule') }}" class="menu-item" onclick="switchTab(this)">相關資料</a></li>
+        </ul>
+    </div>
+    <div class="report">
+        <h2>ESGenius</h2>
+        <select name="industry" id="industry-select" onchange="updateReportContent()">
+            <option value="elec">電子</option>
+            <option value="fin">金融</option>
+            <option value="ind">製造業</option>
+            <option value="tra">運輸</option>
+            <option value="con">零售</option>
+        </select>
+        <div id="report-content">
+            <div style="font-weight: bold;">原始內文:</div>
+            <div id="dynamic-report"></div>
+            <hr /> 
+            <div style="font-weight: bold;">修改後內文:</div>
+            <div id="dynamic-after"></div>
+        </div>
+        <div class="input-box">
+            <input type="text" id="user-input" placeholder="輸入訊息..." onkeyup="handleInput(event)" />
+            <input type="file" id="file-input" accept=".pdf, .md" onchange="handleFileUpload(event)" hidden />
+            <label for="file-input" class="file-upload-label">
+                <i class="fa fa-paperclip"></i> <!-- 迴紋針圖標 -->
+            </label>
+        </div>
+        
+        
+             
+    </div>
+    <div class="hint">
+        <h2 class="hint-header" onclick="toggleHint()">
+            修改建議 
+            <span class="toggle-arrow">&#10095;</span> 
+        </h2>
+        <div class="hint-content">
+            <div id="dynamic-advice"></div>
+            <h2 class="hint-tag">評分標準:</h2>
+            <div id="dynamic-score" style="font-weight: bold; margin-top: -10px;"></div>
+            <div id="dynamic-scoreadvice"></div>
+        </div>
+    </div>
+    
+
+    <script src="{{ url_for('static', filename='chat.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.12/marked.min.js"></script>
+
+    <script>
+    async function handleInput(event) {
+        if (event.key === 'Enter') {
+            var inputField = document.getElementById('user-input');
+            var userMessage = inputField.value.trim();
+            after=''
+            if (userMessage !== "") {
+                // 清空輸入框
+                inputField.value = "";
+
+                // 顯示用戶訊息
+                var userMessageElement = document.createElement('div');
+                // userMessageElement.className = 'message user-message';
+                // userMessageElement.textContent = userMessage;
+                var chatContent = document.getElementById('report-content');
+                chatContent.appendChild(userMessageElement);
+                industry=''
+                for (const key in checkcontent){
+                    if(checkcontent[key]==userMessage){
+                        after=beforeReporter[key];
+                        industry=key;
+                        break;
+                    }
+                }
+                document.getElementById('dynamic-report').innerHTML = userMessage.replace(/\n/g, "<br>").trim();
+                setTimeout(function() {
+                    document.getElementById('dynamic-report').innerHTML = after.replace(/\n/g, "<br>").trim();
+                    document.getElementById('dynamic-advice').innerHTML = revise_advice[industry].replace(/\n/g, "<br>").trim();
+                    document.getElementById('dynamic-after').innerHTML = afterReporter[industry].replace(/\n/g, "<br>").trim();
+                    document.getElementById('dynamic-score').innerHTML = score[industry].replace(/\n/g, "<br>").trim();
+                    document.getElementById('dynamic-scoreadvice').innerHTML = score_advice[industry].replace(/\n/g, "<br>").trim();
+                }, 5000); // 3000 毫秒 = 3 秒
+
+                // // 發送用戶訊息到後端 API
+                // try {
+                //     const response = await fetch('/report', {
+                //         method: 'POST',
+                //         headers: {
+                //             'Content-Type': 'application/json',
+                //         },
+                //         body: JSON.stringify({ message: userMessage })
+                //     });
+
+                //     const data = await response.json();
+                //     var systemMessageElement = document.createElement('div');
+                //     systemMessageElement.className = 'message system-message';
+                //     systemMessageElement.textContent = data.answer;
+                //     chatContent.appendChild(systemMessageElement);
+
+                //     chatContent.scrollTop = chatContent.scrollHeight; // 自動滾動到最新訊息
+
+                // } catch (error) {
+                //     console.error("Error:", error);
+                //     var systemMessageElement = document.createElement('div');
+                //     systemMessageElement.className = 'message system-message';
+                //     systemMessageElement.textContent = "發送失敗，請稍後重試。";
+                //     chatContent.appendChild(systemMessageElement);
+                //     chatContent.scrollTop = chatContent.scrollHeight; // 自動滾動到最新訊息
+
+                // }
+            }
+        }
+    }
+
+    const checkcontent = {
+        elec: "電力為本公司在能源消耗的主要部分，其餘包含少部分石化燃料使用，因此，提高能源使用效率及再生能源比率，為本公司的能源管理方針，我們積極致力於減少能源消耗，比如推動節能減碳計劃，並逐步增加可再生能源的使用，目標是在未來五年內達到能源使用的顯著減少，並提高可再生能源在整體能源結構中的比例，為了系統化管理能源，我們也導入ISO 50001能源管理系統，藉由管理系統的有效運作，搭配即時能源看板，挖掘耗能熱點並進行分析，根據分析結果制定能源專案。定期召開能源專案會議跟進執行進度及成果，通過各廠區互相交流分享，持續提升能源使用效率。",
+        fin: "自2022年7月本公司推出綠色定期存款專案，以回應政府綠色金融行動方案2.0及3.0。截至2023年底超過40家企業參與此專案，我們致力於推動綠色金融，目標是透過綠色債券和永續發展專案來降低金融活動對環境的負面影響，並加強對環境風險的管控。我們也將擴大綠色金融投資，促進低碳經濟的發展。包括運輸、電子、化工、零售、工具機及工程營建等產業領導企業，累積總承作規模逾新台幣300億元。綠色存款資金投入再生能源產業（例如：太陽能電廠融資、風力發電、漁電共生等）。遵循國際綠色金融原則並與第三方顧問，2023年9月針對綠色存款資金運用情形出具首次確信報告。",
+        ind: "落實環境管理:1. 我們積極推行減少廢棄物的政策，並將廠內廢棄物再利用率提升至80%，公司同時制定了進一步減少總廢棄物產生的長期目標，旨在降低對環境的影響，並提升資源的有效利用率。2. 兼併或收購事業單位時，落實環境盡職調查。導入ISO 14001環境管理系統，每年進行內外部稽核，系統性3控制對環境的衝擊。3. 2023年本公司及子公司生產工廠ISO 14001環境管理系統覆蓋率已達86%，未來將逐步擴大系統涵蓋率。\n",
+        tra: "我們持續推動低碳運輸，已逐步增加電動車的使用比例，未來將在車隊管理中全面推行綠色運輸，進一步減少碳排放。",
+        con: "我們正在大力減少塑料包裝的使用，並引入更多環保材料作為替代，期望在未來三年內將塑料包裝的使用量減少一半。"
+    };
+    const beforeReporter = {
+        elec: "電力為本公司在能源消耗的主要部分，其餘包含少部分石化燃料使用，因此，提高能源使用效率及再生能源比率，為本公司的能源管理方針，<span class='highlight'>我們積極致力於減少能源消耗，比如推動節能減碳計劃，並逐步增加可再生能源的使用，目標是在未來五年內達到能源使用的顯著減少，並提高可再生能源在整體能源結構中的比例</span>，為了系統化管理能源，我們也導入ISO 50001能源管理系統，藉由管理系統的有效運作，搭配即時能源看板，挖掘耗能熱點並進行分析，根據分析結果制定能源專案。定期召開能源專案會議跟進執行進度及成果，通過各廠區互相交流分享，持續提升能源使用效率。",
+        fin: "自2022年7月本公司推出綠色定期存款專案，以回應政府綠色金融行動方案2.0及3.0。截至2023年底超過40家企業參與此專案，我們致力於推動綠色金融，目標是透過綠色債券和永續發展專案來降低金融活動對環境的負面影響，並加強對環境風險的管控。我們也將擴大綠色金融投資，促進低碳經濟的發展。包括運輸、電子、化工、零售、工具機及工程營建等產業領導企業，累積總承作規模逾新台幣300億元。綠色存款資金投入再生能源產業（例如：太陽能電廠融資、風力發電、漁電共生等）。遵循國際綠色金融原則並與第三方顧問，2023年9月針對綠色存款資金運用情形出具首次確信報告。",
+        ind: "<span style='font-weight: bold;'>落實環境管理:</span>\n<span class='highlight'>1. 我們積極推行減少廢棄物的政策，並將廠內廢棄物再利用率提升至80%，公司同時制定了進一步減少總廢棄物產生的長期目標，旨在降低對環境的影響，並提升資源的有效利用率。</span>\n2. 兼併或收購事業單位時，落實環境盡職調查。導入ISO 14001環境管理系統，每年進行內外部稽核，系統性3控制對環境的衝擊。\n3. 2023年本公司及子公司生產工廠ISO 14001環境管理系統覆蓋率已達86%，未來將逐步擴大系統涵蓋率。\n",
+        tra: "我們持續推動低碳運輸，已逐步增加電動車的使用比例，未來將在車隊管理中全面推行綠色運輸，進一步減少碳排放。",
+        con: "我們正在大力減少塑料包裝的使用，並引入更多環保材料作為替代，期望在未來三年內將塑料包裝的使用量減少一半。"
+    };
+
+    const revise_advice ={
+        elec:'數據：實際能源消耗減少的百分比。\n時間：描述明確的時間範圍和進度。\n' ,
+        fin: '細節：綠色金融行動。\n影響：加入環境風險降低的具體影響評估。\n',
+        ind: '措施：描述如何減少廢棄物。\n影響：提供對環境的具體影響。\n',
+        tra: '目標：明確電動車的使用比例。\n未來規劃：提供長期計劃與預期效益。\n',
+        con: '措施：具體替代材料和減少的塑料量。\n影響：對環境的正面影響。\n',
+    }
+
+    const score ={
+        elec:'可信度(35%)\n' ,
+        fin: '細節：綠色金融行動。\n影響：加入環境風險降低的具體影響評估。\n',
+        ind: '可信度（35%）',
+        tra: '目標：明確電動車的使用比例。\n未來規劃：提供長期計劃與預期效益。\n',
+        con: '措施：具體替代材料和減少的塑料量。\n影響：對環境的正面影響。\n',
+    }
+
+    const score_advice ={
+        elec:'績效: 藉由質化的說明與數據完整揭露績效（重大性議題涵蓋經濟、環境與社會）' ,
+        fin: '細節：綠色金融行動。\n影響：加入環境風險降低的具體影響評估。\n',
+        ind: '利害關係人共榮:\n企業實際回應利害關係人所關注之議題，並提出相對應之作為、策略與規制等政策',
+        tra: '目標：明確電動車的使用比例。\n未來規劃：提供長期計劃與預期效益。\n',
+        con: '措施：具體替代材料和減少的塑料量。\n影響：對環境的正面影響。\n',
+    }
+
+    const afterReporter = {
+        elec: "電力為本公司在能源消耗的主要部分，其餘包含少部分石化燃料使用，因此，提高能源使用效率及再生能源比率，為本公司的能源管理方針，<span class='red_color strikethrough'>我們積極致力於減少能源消耗，比如推動節能減碳計劃，並逐步增加可再生能源的使用，目標是在未來五年內達到能源使用的顯著減少，並提高可再生能源在整體能源結構中的比例</span>，<span class='green_color'>2023年能源消耗減少15%，我們計劃到2025年進一步減少25%。目前已採用30%的可再生能源，未來五年內計劃提升至60%，通過加強能源管理系統、優化製造流程和引進智能節能技術來實現這一目標</span>，為了系統化管理能源，我們也導入ISO 50001能源管理系統，藉由管理系統的有效運作，搭配即時能源看板，挖掘耗能熱點並進行分析，根據分析結果制定能源專案。定期召開能源專案會議跟進執行進度及成果，通過各廠區互相交流分享，持續提升能源使用效率。",
+        fin: "本公司全力推動綠色金融，2023年通過發行綠色債券籌集100億新台幣，並投入低碳經濟發展專案。我們預計到2025年擴大投資至200億新台幣，支持再生能源項目、綠色基礎設施和氣候變遷調適計畫。我們已建立綠色投資評估標準，從環境風險、社會影響及長期經濟效益多方面進行全方位評估，確保每項投資均符合永續發展的目標。",
+        ind: "<span style='font-weight: bold;'>落實環境管理:\n</span><span class='red_color strikethrough'>1. 我們積極推行減少廢棄物的政策，並將廠內廢棄物再利用率提升至80%，公司同時制定了進一步減少總廢棄物產生的長期目標，旨在降低對環境的影響，並提升資源的有效利用率。</span>\n<span class='green_color'>1. 2023年我們的廠內廢棄物再利用率達到85%，並且減少了整體廢棄物產生量20%。我們將持續優化工業生產中的資源回收流程，未來五年內目標達到再利用率90%，並通過改進製造技術和提升資源回收效率，實現每年減少30%的廢棄物，從而進一步降低對環境的負面影響。\n</span>2. 兼併或收購事業單位時，落實環境盡職調查。導入ISO 14001環境管理系統，每年進行內外部稽核，系統性3控制對環境的衝擊。\n3. 2023年本公司及子公司生產工廠ISO 14001環境管理系統覆蓋率已達86%，未來將逐步擴大系統涵蓋率。",
+        tra: "2023年，公司已成功將電動車在車隊中的使用比例提升至40%，並計劃到2025年達到60%的全面替代。我們正在擴大充電基礎設施的佈局，以支持綠色運輸體系的建設，並透過智能路線規劃系統降低能源消耗。根據預估，這一措施將使我們的年度碳排放量降低15%，成為實現公司淨零排放目標的重要里程碑。",
+        con: "2023年，公司已經減少了40%的塑料包裝使用量，並引入完全可回收的紙質包裝材料，目標是在2026年將塑料包裝的使用減少60%。我們正在推行全面的綠色包裝計劃，與供應鏈合作採用更多生物降解材料，預計每年可減少1000噸的塑料垃圾，並降低碳足跡，同時實現消費者對環保產品需求的提升。"
+    };
+    // document.addEventListener("DOMContentLoaded", function() {
+    //         updateReportContent(); // 確保頁面載入時顯示報告內容
+    //     });
+
+        // 更新報告內容
+    function updateReportContent() {
+        const industry = document.getElementById('industry-select').value;
+        document.getElementById('dynamic-report').innerHTML = beforeReporter[industry].replace(/\n/g, "<br>").trim();
+        document.getElementById('dynamic-advice').innerHTML = revise_advice[industry].replace(/\n/g, "<br>").trim();
+        document.getElementById('dynamic-after').innerHTML = afterReporter[industry].replace(/\n/g, "<br>").trim();
+        document.getElementById('dynamic-score').innerHTML = score[industry].replace(/\n/g, "<br>").trim();
+        document.getElementById('dynamic-scoreadvice').innerHTML = score_advice[industry].replace(/\n/g, "<br>").trim();
+    }
+
+    let currentImageIndex = 0;
+        const images = [
+            'static/images/report/1.jpg',
+            'static/images/report/2.jpg'
+        ];
+
+    function changeImage(direction) {
+        currentImageIndex += direction;
+        if (currentImageIndex < 0) currentImageIndex = images.length - 1;
+        if (currentImageIndex >= images.length) currentImageIndex = 0;
+        document.getElementById('hint-image').src = images[currentImageIndex];
+    }
+    let currentImageIndex_re = 0;
+        const re_images = [
+            'static/images/G/1.jpg',
+            'static/images/E/1.jpg', // Add more image paths here
+            'static/images/S/1.jpg'
+        ];
+
+    function changeImage_re(direction) {
+        currentImageIndex_re += direction;
+        if (currentImageIndex_re < 0) currentImageIndex_re = re_images.length - 1;
+        if (currentImageIndex_re >= re_images.length) currentImageIndex_re = 0;
+        document.getElementById('hint-image_re').src = re_images[currentImageIndex_re];
+    }
+
+    function openModal(img) {
+        var modal = document.getElementById("myModal");
+        var modalImg = document.getElementById("modalImage");
+        modal.style.display = "block";
+        modalImg.src = img.src;
+    }
+    
+    function closeModal() {
+        var modal = document.getElementById("myModal");
+        modal.style.display = "none";
+    }
+    
+    const messageDiv = document.getElementById("systemMessage");
+    const showMore = document.getElementById("showMore");
+
+    showMore.addEventListener("click", function() {
+        messageDiv.classList.toggle("expanded");
+        showMore.textContent = messageDiv.classList.contains("expanded") ? "顯示較少" : "顯示更多";
+    });
+
+    function handleFileUpload(event) {
+    const file = event.target.files[0];
+
+    if (file) {
+        const fileName = file.name;
+        const fileSize = file.size;
+        const fileType = file.type;
+
+        console.log("File selected:", fileName, fileSize, fileType);
+
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            const content = e.target.result;
+
+            // 获取 chatContent 元素并清空其内容
+            var chatContent = document.getElementById('report-content');
+            chatContent.innerHTML = ""; // 清空之前的内容
+            
+            // 显示文件名和大小
+            var fileInfoElement = document.createElement('div');
+            fileInfoElement.textContent = `檔案已上傳: ${fileName} (${(fileSize / 1024).toFixed(2)} KB)`;
+            chatContent.appendChild(fileInfoElement);
+
+            // 处理 Markdown 文件
+            if (fileName.endsWith(".md") || fileType === "text/markdown" || fileType === "text/x-markdown") {
+                var markdownContentElement = document.createElement('div');
+                // 使用 marked.js 解析 Markdown 内容
+                markdownContentElement.innerHTML = marked(content);
+                chatContent.appendChild(markdownContentElement);
+            }
+            // 处理 PDF 文件
+            else if (fileType === "application/pdf") {
+                const pdfText = await extractPDFText(content); // 提取 PDF 文本
+                var pdfContentElement = document.createElement('div');
+                pdfContentElement.textContent = pdfText; // 显示提取的 PDF 内容
+                chatContent.appendChild(pdfContentElement);
+            } else {
+                alert("僅支援 PDF 和 Markdown 檔案格式");
+            }
+
+            chatContent.scrollTop = chatContent.scrollHeight; // 自动滚动到最新消息
+        };
+
+        // 读取文件的内容
+        if (fileType === "application/pdf") {
+            reader.readAsArrayBuffer(file); // 将 PDF 文件读取为 ArrayBuffer
+        } else if (fileName.endsWith(".md") || fileType === "text/markdown" || fileType === "text/x-markdown") {
+            reader.readAsText(file); // 将 Markdown 文件读取为文本
+        } else {
+            alert("僅支援 PDF 和 Markdown 檔案格式");
+        }
+    }
+}
+
+    function extractPDFText(pdfData) {
+    const loadingTask = pdfjsLib.getDocument({data: pdfData});
+    loadingTask.promise.then(pdf => {
+        const chatContent = document.getElementById('report-content');
+        
+        // 清空内容，以便后续显示
+        chatContent.innerHTML = "";
+
+        let textContent = ""; // 存储提取的文本内容
+        const numPages = pdf.numPages;
+
+        const extractPromises = [];
+
+        for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+            extractPromises.push(
+                pdf.getPage(pageNum).then(page => {
+                    return page.getTextContent().then(text => {
+                        const pageText = text.items.map(item => item.str).join(' '); // 提取文本
+                        textContent += `第 ${pageNum} 页: ${pageText}\n\n`; // 收集文本
+                    });
+                })
+            );
+        }
+
+        // 等待所有页面的文本提取完成
+        Promise.all(extractPromises).then(() => {
+            // 创建一个文本元素显示提取的内容
+            const textElement = document.createElement('div');
+            // textElement.className = 'message system-message';
+            textElement.textContent = textContent; // 显示提取的文本内容
+            chatContent.appendChild(textElement);
+
+            chatContent.scrollTop = chatContent.scrollHeight; // 自动滚动到最新消息
+        });
+    }).catch(error => {
+        console.error("Error loading PDF:", error);
+        alert("PDF 檔案加載失敗。");
+    });
+}
+
+
+
+
+    </script>
+    
+
+</body>
+</html>

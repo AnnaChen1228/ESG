@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> ESGenius</title>
+    <link rel="icon" href="{{url_for('static',filename='images/agents.png')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="menu">
+        <h2>Menu</h2>
+        <ul>
+            <li><a href="{{ url_for('home') }}" class="menu-item" onclick="switchTab(this)">Chatbot</a></li>
+            <li><a href="{{ url_for('generator_reporter') }}" class="menu-item" onclick="switchTab(this)">報告生成</a></li>
+            <li><a href="{{ url_for('gonvernment_rule') }}" class="menu-item" onclick="switchTab(this)">相關政策</a></li>
+            <li><a href="{{ url_for('write_rule') }}" class="menu-item" onclick="switchTab(this)">撰寫準則</a></li>
+            <li><a href="{{ url_for('reporter') }}" class="menu-item active" onclick="switchTab(this)">永續報告書範例</a></li>
+        </ul>
+    </div>
+    <div class="report">
+        <h2>永續報告書範例</h2>
+        <div id="report-content">
+            <div class="input-box">
+                <input type="text" id="user-input" placeholder="輸入查找範例" onkeyup="handleInput(event)" />
+            </div>
+            <div class="section">E</div>
+            <div class="section">S</div>
+            <div class="section">G</div>
+            <img class="image" src="static/images/E/1.jpg" onclick="openModal(this)">
+            <img class="image" src="static/images/S/1.jpg" onclick="openModal(this)">
+            <img class="image" src="static/images/G/1.jpg" onclick="openModal(this)">
+            <img class="image" src="static/images/E/1.jpg" onclick="openModal(this)">
+            <img class="image" src="static/images/S/1.jpg" onclick="openModal(this)">
+            <img class="image" src="static/images/G/1.jpg" onclick="openModal(this)">
+            <img class="image" src="static/images/E/1.jpg" onclick="openModal(this)">
+            <img class="image" src="static/images/S/1.jpg" onclick="openModal(this)">
+            <img class="image" src="static/images/G/1.jpg" onclick="openModal(this)">
+        </div>
+    </div>
+
+    <!-- 模态窗口 -->
+    <div id="myModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <script src="{{ url_for('static', filename='chat.js') }}"></script>
+    <script>
+    async function handleInput(event) {
+        if (event.key === 'Enter') {
+            var inputField = document.getElementById('user-input');
+            var userMessage = inputField.value.trim();
+            
+            if (userMessage !== "") {
+                // 清空輸入框
+                inputField.value = "";
+
+                // 顯示用戶訊息
+                var userMessageElement = document.createElement('div');
+                userMessageElement.className = 'message user-message';
+                userMessageElement.textContent = userMessage;
+                var chatContent = document.getElementById('chat-content');
+                chatContent.appendChild(userMessageElement);
+
+                // 發送用戶訊息到後端 API
+                try {
+                    const response = await fetch('/report', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ message: userMessage })
+                    });
+
+                    const data = await response.json();
+                    var systemMessageElement = document.createElement('div');
+                    systemMessageElement.className = 'message system-message';
+                    systemMessageElement.textContent = data.answer;
+                    
+                    // print(data.response)
+                    chatContent.appendChild(systemMessageElement);
+                    var refMessageElement = document.createElement('div');
+                    refMessageElement.className='message ref-message';
+                    refMessageElement.textContent=data.ref;
+                    chatContent.appendChild(refMessageElement);
+                    chatContent.scrollTop = chatContent.scrollHeight; // 自動滾動到最新訊息
+
+                } catch (error) {
+                    console.error("Error:", error);
+                    var systemMessageElement = document.createElement('div');
+                    systemMessageElement.className = 'message system-message';
+                    systemMessageElement.textContent = "發送失敗，請稍後重試。";
+                    chatContent.appendChild(systemMessageElement);
+                }
+            }
+        }
+    }
+    function openModal(img) {
+        var modal = document.getElementById("myModal");
+        var modalImg = document.getElementById("modalImage");
+        modal.style.display = "block";
+        modalImg.src = img.src;
+    }
+    
+    function closeModal() {
+        var modal = document.getElementById("myModal");
+        modal.style.display = "none";
+    }</script>
+</body>
+</html>
