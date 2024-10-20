@@ -31,8 +31,9 @@
             <!-- 聊天內容 -->
         </div>
         <div class="input-box">
-            <input type="text" id="user-input" placeholder="輸入訊息..." onkeyup="handleInput(event)" />
+            <textarea id="user-input" placeholder="輸入訊息..." onkeydown="handleInput(event)" oninput="autoResize(this)"></textarea>
         </div>
+        
     </div>
 
     <!-- src="{{ url_for('static', filename='chat.js') }}" -->
@@ -46,7 +47,7 @@
         let Answer = [
             '溫室氣體之總排放量之計算方式可以依據公司政策決定，採用控制權法或股權比例法。無論選擇哪種方法，母公司與子公司應一致性地使用相同的計算',
             '依 2023 年 11 月 10 日公告修正之「公開發行公司年報應行記載事項準則」，如果年報中揭露的溫室氣體排放資料來不及經確信機構驗證，企業可以自結的估計數揭露。',
-            '溫室氣體盤查之重大性標準主要包括以下幾個方面：\n1. 重大性標準為總排放量的5%。也就是說，上市上櫫公司未納入揭露的溫室氣體排放量，不能超過總排放量的5%。\n2. 階段性推動：由於永續路徑圖採分階段推動，該5%的計算以強制揭露範圍為基礎。如強制揭露範圍為母公司，則以母公司溫室氣體總排放量的5%為準；如強制揭露範圍包含合併財務報告的子公司，則以合併個體的溫室氣體總排放量的5%為準。'
+            '溫室氣體盤查之重大性標準主要包括以下幾個方面：\n1. 重大性標準為總排放量的5%。也就是說，上市上櫃公司未納入揭露的溫室氣體排放量，不能超過總排放量的5%。\n2. 階段性推動：由於永續路徑圖採分階段推動，該5%的計算以強制揭露範圍為基礎。如強制揭露範圍為母公司，則以母公司溫室氣體總排放量的5%為準；如強制揭露範圍包含合併財務報告的子公司，則以合併個體的溫室氣體總排放量的5%為準。'
         ];
     
         let Reference = [
@@ -56,21 +57,25 @@
         ];
     
         async function handleInput(event) {
-            if (event.key === 'Enter') {
-                var inputField = document.getElementById('user-input');
+            var inputField = document.getElementById('user-input');
+
+            // 檢查是否按下 Enter 鍵且未按 Shift 鍵
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault(); // 阻止默認的換行行為
                 var userMessage = inputField.value.trim();
                 
                 if (userMessage !== "") {
-                    // 清空輸入框
-                    inputField.value = "";
-    
                     // 顯示用戶訊息
                     var userMessageElement = document.createElement('div');
                     userMessageElement.className = 'message user-message';
                     userMessageElement.textContent = userMessage;
                     var chatContent = document.getElementById('chat-content');
                     chatContent.appendChild(userMessageElement);
-    
+
+                    // 清空輸入框並恢復高度
+                    inputField.value = ""; 
+                    inputField.style.height = '40px'; // 恢復原始高度
+
                     // 查找對應的問題
                     let matchedIndex = -1;
                     for (let i = 0; i < Question.length; i++) {
@@ -79,39 +84,41 @@
                             break;
                         }
                     }
-    
+
                     if (matchedIndex !== -1) {
                         // 延遲1秒後顯示答案
                         setTimeout(() => {
-                            // 顯示系統訊息 (答案)
                             var systemMessageElement = document.createElement('div');
                             systemMessageElement.className = 'message system-message';
                             systemMessageElement.innerHTML = Answer[matchedIndex].replace(/\n/g, "<br>");
-
                             chatContent.appendChild(systemMessageElement);
-    
+
                             // 顯示參考資料
                             var refMessageElement = document.createElement('div');
                             refMessageElement.className = 'message ref-message';
                             refMessageElement.textContent = Reference[matchedIndex];
                             chatContent.appendChild(refMessageElement);
-    
+
                             // 自動滾動到最新訊息
                             chatContent.scrollTop = chatContent.scrollHeight;
-                        }, 2000); // 1秒延遲
+                        }, 2000);
                     } else {
-                        // 未匹配到問題，顯示錯誤訊息
                         var systemMessageElement = document.createElement('div');
                         systemMessageElement.className = 'message system-message';
                         systemMessageElement.textContent = "抱歉，我無法找到相關的答案。";
                         chatContent.appendChild(systemMessageElement);
-    
-                        // 自動滾動到最新訊息
                         chatContent.scrollTop = chatContent.scrollHeight;
                     }
                 }
             }
         }
+
+        // 自動調整高度的函數
+        function autoResize(textarea) {
+            textarea.style.height = 'auto'; // 重置高度
+            textarea.style.height = textarea.scrollHeight + 'px'; // 設置新高度
+        }
+
     </script>
     
     

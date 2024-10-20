@@ -60,15 +60,12 @@
             <div id="dynamic-after"></div>
         </div>
         <div class="input-box">
-            <input type="text" id="user-input" placeholder="輸入訊息..." onkeyup="handleInput(event)" />
+            <textarea id="user-input" placeholder="輸入訊息..." onkeydown="handleInput(event)" oninput="autoResize(this)"></textarea>
             <input type="file" id="file-input" accept=".pdf, .md" onchange="handleFileUpload(event)" hidden />
             <label for="file-input" class="file-upload-label">
                 <i class="fa fa-paperclip"></i> <!-- 迴紋針圖標 -->
             </label>
-        </div>
-        
-        
-             
+        </div>   
     </div>
     <div class="hint">
         <h2 class="hint-header" onclick="toggleHint()">
@@ -90,14 +87,15 @@
 
     <script>
     async function handleInput(event) {
-        if (event.key === 'Enter') {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault(); // 阻止默認的換行行為
             var inputField = document.getElementById('user-input');
             var userMessage = inputField.value.trim();
             after=''
             if (userMessage !== "") {
                 // 清空輸入框
                 inputField.value = "";
-
+                inputField.style.height = '40px';
                 // 顯示用戶訊息
                 var userMessageElement = document.createElement('div');
                 // userMessageElement.className = 'message user-message';
@@ -114,7 +112,7 @@
                 }
                 document.getElementById('dynamic-report').innerHTML = userMessage.replace(/\n/g, "<br>").trim();
                 setTimeout(function() {
-                    document.getElementById('dynamic-report').innerHTML = after.replace(/\n/g, "<br>").trim();
+                    // document.getElementById('dynamic-report').innerHTML = after.replace(/\n/g, "<br>").trim();
                     document.getElementById('dynamic-advice').innerHTML = revise_advice[industry].replace(/\n/g, "<br>").trim();
                     document.getElementById('dynamic-after').innerHTML = afterReporter[industry].replace(/\n/g, "<br>").trim();
                     document.getElementById('dynamic-score').innerHTML = score[industry].replace(/\n/g, "<br>").trim();
@@ -155,7 +153,7 @@
     const checkcontent = {
         elec: "電力為本公司在能源消耗的主要部分，其餘包含少部分石化燃料使用，因此，提高能源使用效率及再生能源比率，為本公司的能源管理方針，我們積極致力於減少能源消耗，比如推動節能減碳計劃，並逐步增加可再生能源的使用，目標是在未來五年內達到能源使用的顯著減少，並提高可再生能源在整體能源結構中的比例，為了系統化管理能源，我們也導入ISO 50001能源管理系統，藉由管理系統的有效運作，搭配即時能源看板，挖掘耗能熱點並進行分析，根據分析結果制定能源專案。定期召開能源專案會議跟進執行進度及成果，通過各廠區互相交流分享，持續提升能源使用效率。",
         fin: "自2022年7月本公司推出綠色定期存款專案，以回應政府綠色金融行動方案2.0及3.0。截至2023年底超過40家企業參與此專案，我們致力於推動綠色金融，目標是透過綠色債券和永續發展專案來降低金融活動對環境的負面影響，並加強對環境風險的管控。我們也將擴大綠色金融投資，促進低碳經濟的發展。包括運輸、電子、化工、零售、工具機及工程營建等產業領導企業，累積總承作規模逾新台幣300億元。綠色存款資金投入再生能源產業（例如：太陽能電廠融資、風力發電、漁電共生等）。遵循國際綠色金融原則並與第三方顧問，2023年9月針對綠色存款資金運用情形出具首次確信報告。",
-        ind: "落實環境管理:1. 我們積極推行減少廢棄物的政策，並將廠內廢棄物再利用率提升至80%，公司同時制定了進一步減少總廢棄物產生的長期目標，旨在降低對環境的影響，並提升資源的有效利用率。2. 兼併或收購事業單位時，落實環境盡職調查。導入ISO 14001環境管理系統，每年進行內外部稽核，系統性3控制對環境的衝擊。3. 2023年本公司及子公司生產工廠ISO 14001環境管理系統覆蓋率已達86%，未來將逐步擴大系統涵蓋率。\n",
+        ind: "落實環境管理:1. 我們積極推行減少廢棄物的政策，並將廠內廢棄物再利用率提升至80%，公司同時制定了進一步減少總廢棄物產生的長期目標，旨在降低對環境的影響，並提升資源的有效利用率。2. 兼併或收購事業單位時，落實環境盡職調查。導入ISO 14001環境管理系統，每年進行內外部稽核，系統性3控制對環境的衝擊。3. 2023年本公司及子公司生產工廠ISO 14001環境管理系統覆蓋率已達86%，未來將逐步擴大系統涵蓋率。",
         tra: "我們持續推動低碳運輸，已逐步增加電動車的使用比例，未來將在車隊管理中全面推行綠色運輸，進一步減少碳排放。",
         con: "我們正在大力減少塑料包裝的使用，並引入更多環保材料作為替代，期望在未來三年內將塑料包裝的使用量減少一半。"
     };
@@ -204,12 +202,17 @@
 
         // 更新報告內容
     function updateReportContent() {
-        const industry = document.getElementById('industry-select').value;
-        document.getElementById('dynamic-report').innerHTML = beforeReporter[industry].replace(/\n/g, "<br>").trim();
-        document.getElementById('dynamic-advice').innerHTML = revise_advice[industry].replace(/\n/g, "<br>").trim();
-        document.getElementById('dynamic-after').innerHTML = afterReporter[industry].replace(/\n/g, "<br>").trim();
-        document.getElementById('dynamic-score').innerHTML = score[industry].replace(/\n/g, "<br>").trim();
-        document.getElementById('dynamic-scoreadvice').innerHTML = score_advice[industry].replace(/\n/g, "<br>").trim();
+        // const industry = document.getElementById('industry-select').value;
+        // document.getElementById('dynamic-report').innerHTML = beforeReporter[industry].replace(/\n/g, "<br>").trim();
+        // document.getElementById('dynamic-advice').innerHTML = revise_advice[industry].replace(/\n/g, "<br>").trim();
+        // document.getElementById('dynamic-after').innerHTML = afterReporter[industry].replace(/\n/g, "<br>").trim();
+        // document.getElementById('dynamic-score').innerHTML = score[industry].replace(/\n/g, "<br>").trim();
+        // document.getElementById('dynamic-scoreadvice').innerHTML = score_advice[industry].replace(/\n/g, "<br>").trim();
+        document.getElementById('dynamic-report').innerHTML = '';
+        document.getElementById('dynamic-advice').innerHTML = '';
+        document.getElementById('dynamic-after').innerHTML = '';
+        document.getElementById('dynamic-score').innerHTML = '';
+        document.getElementById('dynamic-scoreadvice').innerHTML ='';
     }
 
     let currentImageIndex = 0;

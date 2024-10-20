@@ -57,3 +57,8 @@ function toggleCheckHint() {
         // headerText.innerHTML = '撰寫指引 <span class="toggle-arrow">&#10095;</span>';
     }
 }
+
+function autoResize(textarea) {
+    textarea.style.height = '40px'; // 设定初始高度，等于 input 高度
+    textarea.style.height = textarea.scrollHeight + 'px'; // 根据内容自动调整高度
+}

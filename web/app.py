@@ -2,7 +2,7 @@ from flask import Flask, render_template,request,jsonify
 import requests
 import os
 from dotenv import load_dotenv
-import web.preprocessing as preprocessing
+import preprocessing as preprocessing
 
 app = Flask(__name__)
 load_dotenv()
