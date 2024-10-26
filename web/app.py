@@ -54,7 +54,8 @@ def dify_rule():
             workflow_response = response_data.get('data', {}).get('outputs', {}).get('text', '無法獲得回應')
             print(workflow_response)
             response=preprocessing.pre_rule(workflow_response)
-            return jsonify(response)
+            print(response)
+            return jsonify(response),200
         except (requests.exceptions.JSONDecodeError, KeyError) as e:
             app.logger.error(f"Error parsing response: {e}")
             return jsonify({'response': 'API 回應的格式無效'}), 500
@@ -108,4 +109,4 @@ def dify_rule():
 #     return render_template('reporter.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0',port=5000,debug=True)

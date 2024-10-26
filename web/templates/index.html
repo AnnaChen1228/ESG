@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> ESGenius</title>
+    <title>ESGenius</title>
     <link rel="icon" href="{{url_for('static',filename='images/agents.png')}}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="menu">
@@ -15,8 +16,7 @@
         </h2>
         <ul class="menu-content">
             <li><a href="{{ url_for('home') }}" class="menu-item active" onclick="switchTab(this)">永續問答</a></li>
-            <li><a href="{{ url_for('generator_reporter') }}" class="menu-item" onclick="switchTab(this)">永續報告書撰寫</a></li>
-            <li><a href="{{ url_for('check_reporter') }}" class="menu-item" onclick="switchTab(this)">報告評比系統</a></li>
+           
             <hr>
             <li><a href="{{ url_for('gonvernment_rule') }}" class="menu-item" onclick="switchTab(this)">相關資料</a></li>
         </ul>
@@ -25,103 +25,87 @@
         <h2>ESGenius</h2>
         <div id="chat-content">
             <div class="message system-message">你好!我是ESGenius，你可以問我任何與ESG有關的問題!!</div>
-            <!-- <div class="message user-message">若公司溫室氣體盤查接露範圍包刮環境部列管之排放源(如工廠)可否直接採用環境部規定?</div>
-            <div class="message system-message">可以的。如果公司包含的溫室氣體盤查皆露範圍包括環境不列管之排放源(如工廠)，那麼直接採用環境部的規定是符合要求的。環境部的規定通常包跨了詳細的排放源分類、計算方式、以及報告格式，這樣可以確保公司的溫室氣體數據具有抑制性和可比較性。這也有助於公司在遵守法規的同時，提升其永續發展和環境責任方面的形象。</div>
-            <div class="message ref-message">參考「上市櫃公司永續發展路徑圖」問答集 Q2 P2</div> -->
-            <!-- 聊天內容 -->
         </div>
         <div class="input-box">
-            <textarea id="user-input" placeholder="輸入訊息..." onkeydown="handleInput(event)" oninput="autoResize(this)"></textarea>
+            <input type="text" id="user-input" placeholder="輸入訊息..." onkeyup="handleInput(event)" />
+            <label onclick="sendMessage()" class="file-upload-label">
+                <i class="fa fa-paper-plane"></i>
+            </label>
+            <!-- <label for="file-input" class="file-upload-label" >
+                <i class="fa fa-paper-plane"></i> 
+            </label> -->
         </div>
         
     </div>
 
-    <!-- src="{{ url_for('static', filename='chat.js') }}" -->
     <script> 
-        let Question = [
-            '溫室氣體之總排放量之計算方式係採用控制權法或股權比例法方式?',
-            '若年報中揭露的溫室氣體排放資料來不及經確信機構驗證，是否可以自結的估計數揭露?',
-            '溫室氣體盤查之重大性標準？'
-        ];
-        
-        let Answer = [
-            '溫室氣體之總排放量之計算方式可以依據公司政策決定，採用控制權法或股權比例法。無論選擇哪種方法，母公司與子公司應一致性地使用相同的計算',
-            '依 2023 年 11 月 10 日公告修正之「公開發行公司年報應行記載事項準則」，如果年報中揭露的溫室氣體排放資料來不及經確信機構驗證，企業可以自結的估計數揭露。',
-            '溫室氣體盤查之重大性標準主要包括以下幾個方面：\n1. 重大性標準為總排放量的5%。也就是說，上市上櫃公司未納入揭露的溫室氣體排放量，不能超過總排放量的5%。\n2. 階段性推動：由於永續路徑圖採分階段推動，該5%的計算以強制揭露範圍為基礎。如強制揭露範圍為母公司，則以母公司溫室氣體總排放量的5%為準；如強制揭露範圍包含合併財務報告的子公司，則以合併個體的溫室氣體總排放量的5%為準。'
-        ];
-    
-        let Reference = [
-            '來源:「上市櫃公司 永續發展路徑圖」 問答集 113 年 2 月',
-            '來源: IFRS 永續揭露準則問答集 日期:2024.2.29',
-            '來源:「上市櫃公司 永續發展路徑圖」 問答集 113 年 2 月'
-        ];
-    
         async function handleInput(event) {
-            var inputField = document.getElementById('user-input');
-
-            // 檢查是否按下 Enter 鍵且未按 Shift 鍵
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault(); // 阻止默認的換行行為
+            if (event.key === 'Enter') {
+                var inputField = document.getElementById('user-input');
                 var userMessage = inputField.value.trim();
                 
                 if (userMessage !== "") {
-                    // 顯示用戶訊息
+                    // 清空輸入框
+                    inputField.value = "";
+
+                    // 顯示用戶消息
                     var userMessageElement = document.createElement('div');
                     userMessageElement.className = 'message user-message';
                     userMessageElement.textContent = userMessage;
                     var chatContent = document.getElementById('chat-content');
                     chatContent.appendChild(userMessageElement);
+                    chatContent.scrollTop = chatContent.scrollHeight;
+                    // 發送消息到後端並處理回應
+                    try {
+                        let response = await fetch('/rule', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ message: userMessage })
+                        });
 
-                    // 清空輸入框並恢復高度
-                    inputField.value = ""; 
-                    inputField.style.height = '40px'; // 恢復原始高度
-
-                    // 查找對應的問題
-                    let matchedIndex = -1;
-                    for (let i = 0; i < Question.length; i++) {
-                        if (userMessage.includes(Question[i])) {
-                            matchedIndex = i;
-                            break;
+                        if (response.ok) {
+                            console.log(1)
+                            let responseData = await response.json();
+                            console.log(responseData)
+                            // 使用 responseData.answer 而不是 responseData.response
+                            displaySystemMessage(responseData); 
+                            console.log(responseData.answer)
+                        } else {
+                            displaySystemMessage("無法獲得有效的回應");
                         }
-                    }
-
-                    if (matchedIndex !== -1) {
-                        // 延遲1秒後顯示答案
-                        setTimeout(() => {
-                            var systemMessageElement = document.createElement('div');
-                            systemMessageElement.className = 'message system-message';
-                            systemMessageElement.innerHTML = Answer[matchedIndex].replace(/\n/g, "<br>");
-                            chatContent.appendChild(systemMessageElement);
-
-                            // 顯示參考資料
-                            var refMessageElement = document.createElement('div');
-                            refMessageElement.className = 'message ref-message';
-                            refMessageElement.textContent = Reference[matchedIndex];
-                            chatContent.appendChild(refMessageElement);
-
-                            // 自動滾動到最新訊息
-                            chatContent.scrollTop = chatContent.scrollHeight;
-                        }, 2000);
-                    } else {
-                        var systemMessageElement = document.createElement('div');
-                        systemMessageElement.className = 'message system-message';
-                        systemMessageElement.textContent = "抱歉，我無法找到相關的答案。";
-                        chatContent.appendChild(systemMessageElement);
-                        chatContent.scrollTop = chatContent.scrollHeight;
+                    } catch (error) {
+                        console.error("Error:", error);
+                        displaySystemMessage("無法連接到伺服器");
                     }
                 }
             }
         }
 
-        // 自動調整高度的函數
-        function autoResize(textarea) {
-            textarea.style.height = 'auto'; // 重置高度
-            textarea.style.height = textarea.scrollHeight + 'px'; // 設置新高度
+
+        function displaySystemMessage(message) {
+            console.log(message)
+            var systemMessageElement = document.createElement('div');
+            systemMessageElement.className = 'message system-message';
+            systemMessageElement.innerHTML = message.answer.replace(/\n/g, "<br>");
+            var chatContent = document.getElementById('chat-content');
+            chatContent.appendChild(systemMessageElement);
+            if(message.ref){
+                var refMessageElement = document.createElement('div');
+                refMessageElement.className = 'message ref-message';
+                refMessageElement.textContent = message.ref.replace(/\n/g, "");
+                chatContent.appendChild(refMessageElement);
+            }
+            // Scroll to latest message
+            chatContent.scrollTop = chatContent.scrollHeight;
+        }
+        function sendMessage() {
+            // 模擬 Enter 鍵事件
+            var event = new KeyboardEvent('keyup', { key: 'Enter' });
+            handleInput(event);
         }
 
     </script>
-    
-    
-    <script src="{{ url_for('static', filename='chat.js') }}"></script>
 </body>
 </html>

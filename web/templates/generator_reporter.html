@@ -67,8 +67,8 @@
 
     <script src="{{ url_for('static', filename='chat.js') }}"></script>
     <script>
-    let Question = ['引導我們撰寫永續報告書，我們是上櫃公司，產業別是半導體','我想要撰寫有關能源的部分','使用者輸入: 我想先撰寫有關減少能源消耗的內容','我想先撰寫有關減少能源消耗的內容'];
-    let Answer = ['依據上櫃公司編製與申報永續報告書作業辦法，若半導體業公司實收資本額20億元以上，需參考GRI準則編製，專章揭露氣候相關資訊，永續指標要依產業別揭露。\n當中GRI準則有下列目錄:<a href="https://www.globalreporting.org/how-to-use-the-gri-standards/gri-standards-traditional-chinese-translations/" target="_blank">GRI目錄</a>','GRI 302能源 的揭露項目有: 組織內部的能源消耗量、組織外部的能源消耗量、能源密集度、減少能源消耗、降低產品和服務的能源需求'];
+    let Question = ['引導我們撰寫永續報告書，我們是上櫃公司，產業別是半導體','我想要撰寫GRI 302：能源 2016部分','我想先撰寫減少能源消耗的內容'];
+    let Answer = ['依據上櫃公司編製與申報永續報告書作業辦法，若半導體業公司實收資本額20億元以上，需參考GRI準則編製，專章揭露氣候相關資訊，永續指標要依產業別揭露。\n當中GRI準則有下列目錄:<a href="https://www.globalreporting.org/how-to-use-the-gri-standards/gri-standards-traditional-chinese-translations/" target="_blank">GRI目錄</a>\n您有想先撰寫哪個部分嗎?','GRI 302能源 的揭露項目有: 組織內部的能源消耗量、組織外部的能源消耗量、能源密集度、減少能源消耗、降低產品和服務的能源需求 \n您有想先撰寫哪個部分嗎?'];
     let Report = [
     '本文章會自行補上一些並非是貴公司的案例提供給您做撰寫參考，請您自行將那些案例替換成符合貴公司的情況再自行修改，謝謝!\n#### 節能改善項目概述\n在2023年，中大永續院公司計畫並正在實施801件節能改善項目。這些項目旨在提高能源效率，減少碳排放，並為公司帶來可觀的經濟效益。具體來說，我們預計每小時可節省蒸汽38.92噸，節省電力15,271度，節省燃料5.758噸，並減少溫室氣體排放量達28.90萬噸二氧化碳當量（CO2e）/年。這些數據顯示了我們在能源管理和溫室氣體減排方面的顯著進展。\n#### 投資與效益\n這些節能改善項目的總投資金額預計達到27.7億元，並且每年的投資效益預估可達12.2億元。這不僅體現了我們對永續發展的強烈承諾，也顯示了我們在經濟效益和環境保護之間取得的平衡。\n#### 氣候相關風險與機會\n氣候變遷帶來的風險與機會對於我們的業務運營至關重要。為了應對這些挑戰，我們積極採取一系列措施，將氣候相關風險納入企業決策中，並認真評估每一個項目對於環境和社會的影響。我們相信，通過積極應對氣候變遷，可以為公司創造更多的機會，並為股東和社會帶來長期的價值。\n#### 清潔技術與創新\n在推動節能改善項目的過程中，我們積極採用清潔技術和創新解決方案。例如，在「冷凍機節電改善」項目中，我們預計每小時可節省電力1,343度。這些技術不僅幫助我們提高資源利用效率，還能減少對環境的影響。我們致力於成為行業內的領導者，為其他企業樹立榜樣。\n#### 利害關係人參與\n我們深信，永續發展需要所有利害關係人的共同努力。因此，我們積極與投資人、自願揭露的利害關係人以及其他重要的利益相關者保持溝通。透過公開透明的資訊披露，我們希望能夠反映組織在經濟、環境和社會方面的重要影響，並且有助於利害關係人的決策。\n#### 全球永續性報告\n我們的永續發展報告遵循全球永續性報告標準（GRI）的指引，並且在報告中詳細披露了每個基金、產品或投資策略相關的溫室氣體排放數據。我們重視數據的準確性和完整性，並且針對質化和量化的情境分析進行了嚴格的內部審核和評估。\n#### 未來展望\n展望未來，我們將繼續致力於推動更多的節能和減排項目，並且不斷尋求創新和技術突破。我們期待與更多的利害關係人合作，共同推動全球的永續發展目標。通過我們的努力，我們相信可以為我們的社會和地球創造一個更加美好的未來。\n#### 結語\n中大永續院公司在2023年的節能改善項目和永續發展努力，充分展示了我們對環境保護、資源節約和社會責任的承諾。我們將繼續以最高的標準要求自己，並且通過透明和負責任的報告，與所有利害關係人分享我們的成果和挑戰。我們相信，只有在共同努力下，才能實現真正的永續發展。'
     ];
@@ -91,18 +91,20 @@
                 userMessageElement.textContent = userMessage;
                 var chatContent = document.getElementById('chat-content');
                 chatContent.appendChild(userMessageElement);
-
+                
                 // 查找對應的問題
                 let matchedIndex = -1;
                 for (let i = 0; i < Question.length; i++) {
-                    if (userMessage.includes(Question[i])) {
+                    if (userMessage==Question[i]) {
                         matchedIndex = i;
                         break;
                     }
                 }
-
+                chatContent.scrollTop = chatContent.scrollHeight;
+                console.log(matchedIndex)
                 if (matchedIndex !== -1) {
-                    if (matchedIndex === 3) {
+                    if (matchedIndex === 2) {
+                        // console.log(1)
                         // 查找是否已經存在報告部分
                         var existingReport = document.querySelector('.report-container');
                         updateMessageDisplay('request', Requestment[0].replace(/\n/g, "<br>"));
@@ -184,6 +186,7 @@
                                     <img class="hint-image" id="hint-image" src="static/images/report/1.jpg" onclick="openModal(this)">
                                 `;
                                 chatContent.appendChild(imageContainer); // 添加到聊天內容
+                                chatContent.scrollTop = chatContent.scrollHeight;
                             }, 5000); // 延遲5秒顯示圖片
                         }
                     } else {
