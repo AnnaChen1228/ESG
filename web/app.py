@@ -100,13 +100,13 @@ def dify_rule():
 #         app.logger.error(f"Error during API request: {e}")
 #         return jsonify({'response': f"Error: {str(e)}"}), 500
     
-# @app.route('/write_rule')
-# def write_rule():
-#     return render_template('write_rule.html')
+@app.route('/write_rule')
+def write_rule():
+    return render_template('write_rule.html')
 
-# @app.route('/reporter')
-# def reporter():
-#     return render_template('reporter.html')
+@app.route('/reporter')
+def reporter():
+    return render_template('reporter.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port=5000,debug=True)

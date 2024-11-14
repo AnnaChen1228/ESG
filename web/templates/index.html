@@ -16,7 +16,8 @@
         </h2>
         <ul class="menu-content">
             <li><a href="{{ url_for('home') }}" class="menu-item active" onclick="switchTab(this)">永續問答</a></li>
-           
+            <li><a href="{{ url_for('generator_reporter') }}" class="menu-item" onclick="switchTab(this)">永續報告書撰寫</a></li>
+            <li><a href="{{ url_for('check_reporter') }}" class="menu-item" onclick="switchTab(this)">報告評比系統</a></li>
             <hr>
             <li><a href="{{ url_for('gonvernment_rule') }}" class="menu-item" onclick="switchTab(this)">相關資料</a></li>
         </ul>
